@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 #include <cstdlib>
+#include <filesystem>
 #include <cstdio>
 #include <random>
 #include <string>
@@ -245,7 +246,7 @@ TEST(GuiDraw, WritePpm) {
   DrawList l;
   l.addRect({0, 0, 2, 2}, {1, 2, 3});
   const Image img = render(l, 4, 4);
-  const std::string path = std::string(std::getenv("TMPDIR") ? std::getenv("TMPDIR") : "/tmp") + "/mingol_gui_test.ppm";
+  const std::string path = (std::filesystem::temp_directory_path() / "mingol_gui_test.ppm").string();
   REQUIRE(writePpm(img, path.c_str()));
   std::FILE* f = std::fopen(path.c_str(), "rb");
   REQUIRE(f != nullptr);
@@ -254,5 +255,5 @@ TEST(GuiDraw, WritePpm) {
   CHECK_EQ(std::string(hdr), std::string("P6\n"));
   std::fclose(f);
   std::remove(path.c_str());
-  CHECK(!writePpm(img, "/nonexistent_dir/x.ppm"));
+  CHECK(!writePpm(img, (std::filesystem::temp_directory_path() / "mingol_no_such_dir" / "x.ppm").string().c_str()));
 }

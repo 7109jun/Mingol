@@ -34,6 +34,14 @@ extern "C" {
 
 #define MS_ABI_VERSION 1u
 
+/* Put in front of the two exported functions so they are visible from the shared library
+ * (required on Windows, where nothing is exported by default). */
+#if defined(_WIN32)
+#define MS_PLUGIN_EXPORT __declspec(dllexport)
+#else
+#define MS_PLUGIN_EXPORT __attribute__((visibility("default")))
+#endif
+
 enum MsTag { MS_TAG_NULL = 0, MS_TAG_INT = 1, MS_TAG_FLOAT = 2, MS_TAG_BOOL = 3, MS_TAG_OBJECT = 4 };
 
 typedef struct MsValue {

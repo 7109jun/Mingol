@@ -62,10 +62,10 @@ static void makePoint(MsVM* vm, MsValue* a, int32_t n, MsValue* r) {
   *r = o;
 }
 
-uint32_t mingol_plugin_abi(void) { return MS_ABI_VERSION; }
+MS_PLUGIN_EXPORT uint32_t mingol_plugin_abi(void) { return MS_ABI_VERSION; }
 
 #define REG(name, fn) do { if (reg->registerNative(reg->ctx, name, fn) != 0) return 1; } while (0)
-int32_t mingol_plugin_init(const MsHostApi* api, const MsRegistrar* reg) {
+MS_PLUGIN_EXPORT int32_t mingol_plugin_init(const MsHostApi* api, const MsRegistrar* reg) {
   g_api = api;
   REG("Native.addInts(int, int)", addInts);
   REG("Native.halve(float)", halve);

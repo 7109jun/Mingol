@@ -9,6 +9,10 @@
 #include <thread>
 
 #include "mingol/package/archive.hpp"
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 #include "mingol_test.hpp"
 
 using namespace mingol;
@@ -395,8 +399,17 @@ TEST(Archive, ExecutableEmbedding) {
   Sample s;
   REQUIRE(s.w.save(dir / "game.mingol", encOpts()).ok());
   // a real executable: this test binary itself
+#if defined(_WIN32)
+  wchar_t selfBuf[MAX_PATH * 4] = {};
+  REQUIRE(GetModuleFileNameW(nullptr, selfBuf, static_cast<DWORD>(sizeof selfBuf / sizeof selfBuf[0])) > 0);
+  const stdfs::path self = selfBuf;
+  const stdfs::path packed = dir / "game_packed.exe";
+  const char* nullDevice = "NUL";
+#else
   const stdfs::path self = stdfs::read_symlink("/proc/self/exe");
   const stdfs::path packed = dir / "game_packed";
+  const char* nullDevice = "/dev/null";
+#endif
   CHECK(!ArchiveReader::hasEmbeddedArchive(self));
   REQUIRE(packExecutable(self, dir / "game.mingol", packed).ok());
   CHECK(ArchiveReader::hasEmbeddedArchive(packed));
@@ -409,7 +422,7 @@ TEST(Archive, ExecutableEmbedding) {
   CHECK(!packExecutable(packed, dir / "game.mingol", dir / "twice").ok());   // already packed
   CHECK(!packExecutable(self, dir / "missing.mingol", dir / "x").ok());
   // the packed file is still an executable that runs (--list prints the registered tests and exits 0)
-  const std::string cmd = "\"" + packed.string() + "\" --list > /dev/null 2>&1";
+  const std::string cmd = "\"" + packed.string() + "\" --list > " + nullDevice + " 2>&1";
   CHECK_EQ(std::system(cmd.c_str()), 0);
   // corrupt the trailer
   {
