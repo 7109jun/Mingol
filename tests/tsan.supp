@@ -1,0 +1,14 @@
+# Races reported entirely inside uninstrumented third-party Vulkan components (the Mesa lavapipe
+# driver threads and the Khronos validation layer). Reviewed individually: the Mingol frames in these
+# reports are only callers (vkDestroySwapchainKHR / vkCreateDevice) made under our queue mutex after
+# vkQueueWaitIdle. Suppressed by module so a race in Mingol code itself still fails the test.
+race:libvulkan_lvp.so
+race:libVkLayer_khronos_validation.so
+# The system libLLVM that lavapipe JIT-compiles shaders with (uninstrumented; its internal locks are
+# invisible to TSan, so allocator/StringMap accesses between llvmpipe worker threads look like races).
+# Every report seen is entirely inside llvmpipe worker threads; no Mingol frame is involved.
+race:libLLVM
+# Lock-order cycle between the validation layer's own internal locks (seen once in ~25 runs, while we
+# destroy the device). None of the mutexes in the cycle belong to Mingol.
+deadlock:libVkLayer_khronos_validation.so
+deadlock:libvulkan_lvp.so

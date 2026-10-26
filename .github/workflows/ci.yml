@@ -1,0 +1,25 @@
+# KNOWN GAP: the windows job installs neither the Vulkan SDK nor glslang yet (engine/shader and
+# engine/rhi need both), so it is expected to fail at configure time until that step is added and
+# verified on a real Windows runner.
+# NOTE: This workflow has not been executed by the author (no GitHub runner or Windows host was
+# available while writing it). Treat the first run as the real verification of the Windows job.
+name: ci
+on: [push, pull_request]
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ninja-build libvulkan-dev glslang-dev glslang-tools mesa-vulkan-drivers vulkan-validationlayers libx11-dev libxcb1-dev libwayland-dev libglfw3-dev xvfb xdotool valgrind libbullet-dev
+      - run: cmake --preset linux-debug && cmake --build --preset linux-debug && ctest --preset linux-debug
+      - run: cmake --preset linux-asan && cmake --build --preset linux-asan && ctest --preset linux-asan
+      - run: cmake --preset linux-tsan && cmake --build --preset linux-tsan && ctest --preset linux-tsan
+      - run: cmake --preset linux-release && cmake --build --preset linux-release && ctest --preset linux-release
+      - run: cmake --preset linux-debug -DMINGOL_VALGRIND_TESTS=ON && cmake --build --preset linux-debug && ctest --preset linux-debug -R valgrind
+
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake --preset windows-msvc && cmake --build --preset windows-msvc && ctest --preset windows-msvc

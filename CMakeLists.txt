@@ -1,0 +1,50 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(Mingol VERSION 0.1.0 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+option(MINGOL_BUILD_TESTS "Build the test suite" ON)
+option(MINGOL_SANITIZE "Enable AddressSanitizer and UndefinedBehaviorSanitizer (GCC/Clang)" OFF)
+option(MINGOL_TSAN "Enable ThreadSanitizer (GCC/Clang; exclusive with MINGOL_SANITIZE)" OFF)
+option(MINGOL_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build type" FORCE)
+endif()
+
+if(MINGOL_SANITIZE)
+  if(MSVC)
+    message(WARNING "MINGOL_SANITIZE is not supported on MSVC in this configuration; ignoring.")
+  else()
+    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined)
+    add_link_options(-fsanitize=address,undefined)
+  endif()
+endif()
+
+if(MINGOL_TSAN)
+  if(MINGOL_SANITIZE)
+    message(FATAL_ERROR "MINGOL_TSAN and MINGOL_SANITIZE cannot be combined")
+  endif()
+  if(MSVC)
+    message(WARNING "MINGOL_TSAN is not supported on MSVC; ignoring.")
+  else()
+    add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=thread)
+  endif()
+endif()
+
+include(cmake/MingolCompileOptions.cmake)
+
+add_subdirectory(engine)
+add_subdirectory(tools)
+add_subdirectory(apps)
+
+if(MINGOL_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

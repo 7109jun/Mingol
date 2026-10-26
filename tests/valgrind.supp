@@ -1,0 +1,29 @@
+# Mesa lavapipe (software Vulkan) leaks 112 bytes (1 block + 1 indirect) from its queue worker
+# thread. Verified with --keep-debuginfo=yes: every frame is inside libvulkan_lvp.so, none in Mingol.
+# A pure-Vulkan program that only creates/destroys instance+device does not trigger it; submitting
+# work does. Suppressed by object so any leak whose stack reaches Mingol code still fails the test.
+{
+   lavapipe-queue-thread-leak
+   Memcheck:Leak
+   match-leak-kinds: definite,indirect
+   fun:calloc
+   obj:*/libvulkan_lvp.so
+   ...
+}
+
+# lavapipe executes JIT-compiled shader code that valgrind cannot see into; it occasionally reports
+# "conditional jump depends on uninitialised value" with every frame inside libvulkan_lvp.so
+# (seen in 1 of 2 identical runs of the renderer tests). Limitation: this also hides uninitialised
+# data that *we* pass into the driver when the first reported frame is in the driver.
+{
+   lavapipe-jit-uninitialised-condition
+   Memcheck:Cond
+   obj:*/libvulkan_lvp.so
+   ...
+}
+{
+   lavapipe-jit-uninitialised-value-use
+   Memcheck:Value8
+   obj:*/libvulkan_lvp.so
+   ...
+}

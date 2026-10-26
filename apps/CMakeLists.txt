@@ -1,0 +1,2 @@
+add_subdirectory(mingol_editor)
+add_subdirectory(mingol_player)
