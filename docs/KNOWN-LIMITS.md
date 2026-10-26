@@ -7,11 +7,11 @@
 ## A. 검증하지 못한 것 (코드는 있음)
 | 항목 | 상태 |
 |---|---|
-| Windows / MSVC | 빌드·테스트 한 번도 실행 안 함. `windows-msvc` 프리셋·Win32 창/표면·`LoadLibrary` 경로·PE 오버레이 단일 EXE 모두 미검증 |
+| Windows / MSVC | CI(`windows-2022`, vcpkg)에서 빌드와 CTest 25개 통과. 미검증: Win32 창·Vulkan 표면, 에디터/플레이어 실제 실행, `LoadLibrary` 실사용, PE 오버레이 단일 EXE 실행, GPU 테스트 실행 여부(러너에 GPU 없음) |
 | 실제 GPU | lavapipe(소프트웨어)만. 성능·드라이버별 동작·실제 프레젠트 미검증 |
 | 실제 오디오 장치 | Null 백엔드만 검증(ALSA/Pulse/WASAPI 미실행) |
 | Wayland, 고DPI, 다중 모니터 | 미검증(Wayland 네이티브는 미지원) |
-| CI 워크플로 | 한 번도 실행되지 않음. Windows 잡은 Vulkan SDK/glslang/Bullet 설치 단계 없음 |
+| CI 워크플로 | 첫 실행에서 Linux 잡 통과, Windows 잡은 의존성(vcpkg)·MSVC 이식성 수정 후 통과. Linux는 asan/tsan/valgrind 단계까지 통과했는지 Actions 기록 확인 필요 |
 | 플러그인 ABI | Linux에서만 실행 검증 |
 | 컴파일러 | GCC 13만. Clang/MSVC 미검증 |
 

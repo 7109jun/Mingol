@@ -16,7 +16,7 @@ C++20 게임 엔진 (2D/3D 공통 코어, Vulkan, 자체 스크립트 `.mins`, �
 | 5. GUI 에디터 | **완료** — 즉시 모드 GUI(`engine/gui`, 소프트웨어 래스터라이저 기준), `mingol-editor`(도킹·뷰포트·기즈모·인스펙터·스크립트 편집기·실행 취소·재생 모드·빌드, [EDITOR.md](docs/EDITOR.md)) |
 | 6. 통합·문서·릴리스 | **진행 중** — 플레이어(`mingol-player`, [PLAYER.md](docs/PLAYER.md)), 벤치마크(`mingol-bench`) 완료. 현황 문서: [STATUS.md](docs/STATUS.md). 남음: [STATUS.md](docs/STATUS.md)의 "미완성" 참고 |
 
-Windows(MSVC) 빌드는 CMake 설정과 코드가 이식성을 고려해 작성되어 있으나 **아직 검증되지 않았다.**
+Windows(MSVC)는 GitHub Actions에서 빌드와 CPU 테스트가 통과한다(vcpkg 의존성). 창/GPU/에디터·플레이어 실제 실행은 **아직 검증되지 않았다.**
 
 ## 빌드 (Linux)
 

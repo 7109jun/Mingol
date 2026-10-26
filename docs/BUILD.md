@@ -50,4 +50,4 @@ ctest --preset linux-release --timeout 300
 - `*_xvfb` 테스트는 xvfb-run이 있을 때만 등록된다.
 
 ## CI
-`.github/workflows/ci.yml`: linux 잡(debug/asan/tsan/release + valgrind), windows 잡. **워크플로는 한 번도 실행되지 않았고**, Windows 잡에는 Vulkan SDK·glslang·Bullet 설치 단계가 없어 지금은 구성 단계에서 실패할 것이다.
+`.github/workflows/ci.yml`: linux 잡(debug/asan/tsan/release + valgrind), windows 잡(vcpkg로 glslang·bullet3·glfw3·vulkan을 설치하고 MSVC로 빌드·테스트). 실패는 `.github/ci-annotate.ps1`가 워크플로 어노테이션으로도 남긴다. 커밋 메시지에 `[win-only]`를 넣으면 느린 Linux 잡을 건너뛴다. Windows는 `-DCMAKE_TOOLCHAIN_FILE=<vcpkg>/scripts/buildsystems/vcpkg.cmake`를 직접 넘겨야 한다.
