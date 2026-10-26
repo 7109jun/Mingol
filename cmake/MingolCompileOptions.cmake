@@ -1,7 +1,7 @@
 # Applies the engine-wide warning policy to a target.
 function(mingol_target_options target)
   if(MSVC)
-    target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8 /Zc:__cplusplus)
+    target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor)
     target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
     if(MINGOL_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE /WX)
