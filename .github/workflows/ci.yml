@@ -1,6 +1,5 @@
-# KNOWN GAP: the windows job installs neither the Vulkan SDK nor glslang yet (engine/shader and
-# engine/rhi need both), so it is expected to fail at configure time until that step is added and
-# verified on a real Windows runner.
+# Windows job: dependencies come from vcpkg (preinstalled on the runner). Failures are also written as
+# workflow annotations (.github/ci-annotate.ps1) so they can be read without downloading logs.
 # NOTE: This workflow has not been executed by the author (no GitHub runner or Windows host was
 # available while writing it). Treat the first run as the real verification of the Windows job.
 name: ci
@@ -8,6 +7,8 @@ on: [push, pull_request]
 
 jobs:
   linux:
+    # a commit message containing [win-only] skips this (slow) job while iterating on Windows
+    if: ${{ !contains(github.event.head_commit.message, '[win-only]') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +21,27 @@ jobs:
 
   windows:
     runs-on: windows-2022
+    env:
+      VCPKG_TRIPLET: x64-windows
     steps:
       - uses: actions/checkout@v4
-      - run: cmake --preset windows-msvc && cmake --build --preset windows-msvc && ctest --preset windows-msvc
+      - name: Install dependencies (vcpkg)
+        shell: pwsh
+        run: |
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install glslang bullet3 glfw3 vulkan-headers vulkan-loader --triplet $env:VCPKG_TRIPLET 2>&1 | Tee-Object -FilePath deps.log
+          if ($LASTEXITCODE -ne 0) { ./.github/ci-annotate.ps1 deps.log; exit 1 }
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake --preset windows-msvc "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DVCPKG_TARGET_TRIPLET=$env:VCPKG_TRIPLET" 2>&1 | Tee-Object -FilePath configure.log
+          if ($LASTEXITCODE -ne 0) { ./.github/ci-annotate.ps1 configure.log; exit 1 }
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build --preset windows-msvc -- /m 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { ./.github/ci-annotate.ps1 build.log; exit 1 }
+      - name: Test
+        shell: pwsh
+        run: |
+          ctest --preset windows-msvc --timeout 300 --output-on-failure 2>&1 | Tee-Object -FilePath test.log
+          if ($LASTEXITCODE -ne 0) { ./.github/ci-annotate.ps1 test.log; exit 1 }
