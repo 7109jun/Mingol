@@ -3,7 +3,7 @@
 param([string]$Path)
 $lines = Get-Content $Path
 $hits = $lines |
-  Where-Object { $_ -match '(error|warning) [A-Z]+[0-9]+|CMake Error|fatal|FAILED|Could NOT|Failed|CHECK|REQUIRE|FAIL|\*\*\*' -and $_ -notmatch 'C2220' } |
+  Where-Object { $_ -match '(error|warning) [A-Z]+[0-9]+|CMake Error|fatal|FAILED|Could NOT|Failed|CHECK|REQUIRE|FAIL|\.cpp:[0-9]+:|\*\*\*' -and $_ -notmatch 'C2220' } |
   ForEach-Object { ($_ -replace '\s*\[[^\]]*\]\s*$', '') -replace 'D:\\a\\Mingol\\Mingol\\', '' } |
   Select-Object -Unique | Select-Object -First 45
 $tail = $lines | Select-Object -Last 8
