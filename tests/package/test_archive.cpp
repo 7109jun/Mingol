@@ -353,7 +353,7 @@ TEST(Archive, FileRoundTripSaveIsAtomicAndReadsAreThreadSafe) {
   const auto before = std::filesystem::file_size(path);
   CHECK(!bad2.save(dir / "no_such_dir" / "x.mingol").ok());
   CHECK_EQ(std::filesystem::file_size(path), before);
-  std::filesystem::remove_all(dir);
+  { std::error_code ec; std::filesystem::remove_all(dir, ec); }  // best effort: Windows refuses while the reader still holds the file
 }
 
 TEST(Archive, MutationFuzzNeverCrashesAndNeverAcceptsDamage) {
@@ -431,7 +431,7 @@ TEST(Archive, ExecutableEmbedding) {
     f.put('\x7f');
   }
   CHECK(!ArchiveReader::openExecutable(packed, testKey()).ok());
-  stdfs::remove_all(dir);
+  { std::error_code ec; stdfs::remove_all(dir, ec); }  // best effort (see above)
 }
 
 TEST(Archive, PackProject) {
@@ -483,5 +483,5 @@ TEST(Archive, PackProject) {
   REQUIRE(saveMindev((dir / "bad.mindev").string(), p).ok());
   CHECK(!packProject(dir / "bad.mindev", {}).ok());
   CHECK(!packProject(dir / "nope.mindev", {}).ok());
-  stdfs::remove_all(dir);
+  { std::error_code ec; stdfs::remove_all(dir, ec); }  // best effort (see above)
 }
