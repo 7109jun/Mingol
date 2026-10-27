@@ -18,10 +18,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y ninja-build libvulkan-dev glslang-dev glslang-tools mesa-vulkan-drivers vulkan-validationlayers libx11-dev libxcb1-dev libwayland-dev libglfw3-dev xvfb xdotool valgrind libbullet-dev
-      - run: cmake --preset linux-debug && cmake --build --preset linux-debug && ctest --preset linux-debug
-      - run: cmake --preset linux-asan && cmake --build --preset linux-asan && ctest --preset linux-asan
-      - run: cmake --preset linux-tsan && cmake --build --preset linux-tsan && ctest --preset linux-tsan
-      - run: cmake --preset linux-release && cmake --build --preset linux-release && ctest --preset linux-release
+      - name: linux-debug
+        shell: bash
+        run: |
+          set -o pipefail
+          { cmake --preset linux-debug && cmake --build --preset linux-debug && ctest --preset linux-debug --timeout 600; } 2>&1 | tee linux-debug.log || { ./.github/ci-annotate.sh linux-debug linux-debug.log; exit 1; }
+      - name: linux-asan
+        shell: bash
+        run: |
+          set -o pipefail
+          { cmake --preset linux-asan && cmake --build --preset linux-asan && ctest --preset linux-asan --timeout 600; } 2>&1 | tee linux-asan.log || { ./.github/ci-annotate.sh linux-asan linux-asan.log; exit 1; }
+      - name: linux-tsan
+        shell: bash
+        run: |
+          set -o pipefail
+          { cmake --preset linux-tsan && cmake --build --preset linux-tsan && ctest --preset linux-tsan --timeout 600; } 2>&1 | tee linux-tsan.log || { ./.github/ci-annotate.sh linux-tsan linux-tsan.log; exit 1; }
+      - name: linux-release
+        shell: bash
+        run: |
+          set -o pipefail
+          { cmake --preset linux-release && cmake --build --preset linux-release && ctest --preset linux-release --timeout 600; } 2>&1 | tee linux-release.log || { ./.github/ci-annotate.sh linux-release linux-release.log; exit 1; }
       - run: cmake --preset linux-debug -DMINGOL_VALGRIND_TESTS=ON && cmake --build --preset linux-debug && ctest --preset linux-debug -R valgrind
 
   package-linux:
