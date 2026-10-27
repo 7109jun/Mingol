@@ -1,9 +1,14 @@
 # Windows job: dependencies come from vcpkg (preinstalled on the runner). Failures are also written as
 # workflow annotations (.github/ci-annotate.ps1) so they can be read without downloading logs.
-# NOTE: This workflow has not been executed by the author (no GitHub runner or Windows host was
-# available while writing it). Treat the first run as the real verification of the Windows job.
+# Artifacts: package-linux / windows upload mingol-linux-x64.zip and mingol-windows-x64.zip on every run;
+# pushing a tag v* also publishes them as a GitHub Release (job `release`).
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+
 
 jobs:
   linux:
@@ -18,6 +23,33 @@ jobs:
       - run: cmake --preset linux-tsan && cmake --build --preset linux-tsan && ctest --preset linux-tsan
       - run: cmake --preset linux-release && cmake --build --preset linux-release && ctest --preset linux-release
       - run: cmake --preset linux-debug -DMINGOL_VALGRIND_TESTS=ON && cmake --build --preset linux-debug && ctest --preset linux-debug -R valgrind
+
+  package-linux:
+    # Release build of the three executables as a downloadable artifact (no tests; the linux job runs those).
+    if: ${{ !contains(github.event.head_commit.message, '[win-only]') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ninja-build libvulkan-dev glslang-dev glslang-tools libx11-dev libxcb1-dev libwayland-dev libglfw3-dev libbullet-dev zip
+      - run: cmake --preset linux-release -DMINGOL_BUILD_TESTS=OFF && cmake --build --preset linux-release --target mingol-editor mingol-player mingol-pack
+      - name: Package
+        run: |
+          mkdir -p dist/mingol-linux-x64
+          for t in mingol-editor mingol-player mingol-pack; do
+            cp "$(find build/linux-release -type f -name $t | head -1)" dist/mingol-linux-x64/
+          done
+          cp LICENSE README.md dist/mingol-linux-x64/ && cp -r docs dist/mingol-linux-x64/docs
+          cat > dist/mingol-linux-x64/RUNNING.txt <<'TXT'
+          Mingol (Linux x86-64, built on Ubuntu 24.04). The executables are dynamically linked:
+            sudo apt install libvulkan1 libglfw3 libbullet-dev mesa-vulkan-drivers   (GPU driver of your choice)
+          Run ./mingol-editor (add --headless without a display), ./mingol-player, ./mingol-pack.
+          TXT
+          chmod +x dist/mingol-linux-x64/mingol-*
+          (cd dist && zip -r mingol-linux-x64.zip mingol-linux-x64)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mingol-linux-x64
+          path: dist/mingol-linux-x64.zip
 
   windows:
     runs-on: windows-2022
@@ -45,3 +77,37 @@ jobs:
         run: |
           ctest --preset windows-msvc --timeout 300 --output-on-failure 2>&1 | Tee-Object -FilePath test.log
           if ($LASTEXITCODE -ne 0) { ./.github/ci-annotate.ps1 test.log; exit 1 }
+      - name: Package
+        shell: pwsh
+        run: |
+          $d = "dist/mingol-windows-x64"
+          New-Item -ItemType Directory -Force $d | Out-Null
+          foreach ($t in 'mingol-editor','mingol-player','mingol-pack') {
+            $exe = Get-ChildItem build/windows-msvc -Recurse -Filter "$t.exe" | Select-Object -First 1
+            Copy-Item $exe.FullName $d
+            Copy-Item (Join-Path $exe.DirectoryName '*.dll') $d -ErrorAction SilentlyContinue   # vcpkg runtime DLLs sit next to each exe
+          }
+          Copy-Item LICENSE, README.md $d
+          Copy-Item docs "$d/docs" -Recurse
+          "Mingol (Windows x64, MSVC). Run mingol-editor.exe / mingol-player.exe / mingol-pack.exe. A Vulkan driver is required (GPU vendor driver)." | Set-Content "$d/RUNNING.txt"
+          Compress-Archive -Path $d -DestinationPath dist/mingol-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mingol-windows-x64
+          path: dist/mingol-windows-x64.zip
+
+  release:
+    # Tag push (v*): attach both zips to a GitHub Release so they can be downloaded without logging in.
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    needs: [package-linux, windows]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - run: gh release create "$GITHUB_REF_NAME" dist/*.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
