@@ -51,3 +51,8 @@ ctest --preset linux-release --timeout 300
 
 ## CI
 `.github/workflows/ci.yml`: linux 잡(debug/asan/tsan/release + valgrind), windows 잡(vcpkg로 glslang·bullet3·glfw3·vulkan을 설치하고 MSVC로 빌드·테스트). 실패는 `.github/ci-annotate.ps1`가 워크플로 어노테이션으로도 남긴다. 커밋 메시지에 `[win-only]`를 넣으면 느린 Linux 잡을 건너뛴다. Windows는 `-DCMAKE_TOOLCHAIN_FILE=<vcpkg>/scripts/buildsystems/vcpkg.cmake`를 직접 넘겨야 한다.
+
+## 미리 빌드된 패키지 (CI 아티팩트 / 릴리스)
+- 모든 CI 실행이 `mingol-linux-x64.zip`(ELF: mingol-editor, mingol-player, mingol-pack)과 `mingol-windows-x64.zip`(.exe + vcpkg DLL)을 아티팩트로 올린다: GitHub → Actions → 해당 실행 → Artifacts (GitHub 로그인 필요, 보관 기간 기본 90일).
+- `v*` 태그를 푸시하면 같은 zip이 GitHub Release에 첨부된다: `git tag v0.1.0 && git push origin v0.1.0`.
+- Linux 바이너리는 동적 링크다(`libvulkan1 libglfw3 libbullet` 등 필요, `RUNNING.txt` 참고). 두 패키지 모두 **GPU/창 환경에서 실행해 보지 못했다**(CI는 빌드만 확인).
