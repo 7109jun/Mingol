@@ -23,4 +23,5 @@
 | [MINDEV.md](MINDEV.md) · [MINSEEN.md](MINSEEN.md) · [MINGOL.md](MINGOL.md) | 파일 형식 |
 | [SECURITY.md](SECURITY.md) | 보안 모델 |
 | [GLOSSARY.md](GLOSSARY.md) | 용어집 |
+| [api/README.md](api/README.md) | **API 레퍼런스** (모듈별 17편) |
 | [LICENSE-DOCS.md](LICENSE-DOCS.md) | 문서 라이선스 |

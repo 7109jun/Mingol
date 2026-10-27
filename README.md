@@ -5,6 +5,7 @@ C++20 게임 엔진 (2D/3D 공통 코어, Vulkan, 자체 스크립트 `.mins`, �
 - 코드: GPL-2.0-only (`LICENSE`)  ·  문서: CC BY 4.0 (`docs/LICENSE-DOCS.md`)
 - 기여하려면: [`CONTRIBUTING.md`](CONTRIBUTING.md) (설계도·코드 스타일·주의점·확장자)
 - 설계 결정과 단계별 계획: [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- API 레퍼런스(모듈별): [`docs/api/README.md`](docs/api/README.md)
 
 ## 현재 상태
 

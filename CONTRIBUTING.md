@@ -63,7 +63,7 @@ platform ◄─ gui ◄─ gui_gpu(+rhi)                 즉시 모드 GUI
 - 불변식 검사는 `MINGOL_VERIFY`(항상) / `MINGOL_ASSERT`(디버그만). **사용자 입력 검사에 쓰지 않는다.**
 - 로그: `MINGOL_LOG_INFO("카테고리", "형식 {}", 값)`.
 - 네이티브 이식: 플랫폼 코드는 `#if defined(_WIN32)`로 가르고, `/proc`, `/tmp`, `/dev/null`, `unistd.h` 같은 POSIX 가정은 코드·**테스트 모두**에서 피한다(`std::filesystem::temp_directory_path()` 사용).
-- 더 자세히: [docs/CODING-GUIDE.md](docs/CODING-GUIDE.md).
+- 더 자세히: [docs/CODING-GUIDE.md](docs/CODING-GUIDE.md). 모듈별 API는 [docs/api/README.md](docs/api/README.md) — 공개 헤더를 바꾸면 해당 문서도 함께 고친다.
 
 ## 4. 주의점 (실제로 겪은 함정)
 | 영역 | 함정 |
