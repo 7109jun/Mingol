@@ -53,7 +53,7 @@ platform ◄─ gui ◄─ gui_gpu(+rhi)                 즉시 모드 GUI
 
 ## 3. 코드 스타일
 (자동 포맷터 설정은 아직 없다. 기존 코드를 보고 맞춘다.)
-- C++20, GCC 13에서 `-Wall -Wextra -Wpedantic -Wshadow -Werror`에 **경고 0**. MSVC는 `/W4 /WX`(`/wd4127` 예외). 예외 처리는 쓰지 않고 `-fno-exceptions`는 아니지만 **에러는 `Result<T>`**.
+- C++20, GCC 13에서 `-Wall -Wextra -Wpedantic -Wshadow -Werror`에 **경고 0**. MSVC는 `/W4 /WX`(`/wd4127` 예외). C++ 예외로 에러를 전달하지 않는다(**에러는 `Result<T>`**).
 - 첫 줄에 `// SPDX-License-Identifier: GPL-2.0-only`. 헤더는 `#pragma once`.
 - 들여쓰기 2칸, 한 줄 약 120자 이내, `public:`/`private:`는 1칸 들여쓰기.
 - 이름: 타입 `PascalCase` · 함수/변수 `camelCase` · 멤버 변수 `name_`(끝에 `_`) · 상수 `kName` · 열거형 `enum class` + `PascalCase` · 네임스페이스 소문자 `mingol::<모듈>` · 매크로 `MINGOL_*`. 순수 데이터 `struct`의 필드는 `_` 없이.
