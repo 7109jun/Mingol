@@ -2,7 +2,7 @@
 
 문서 라이선스: CC BY 4.0. 코드: GPL-2.0-only.
 
-**처음이라면**: [STATUS.md](STATUS.md)(현황) → [GETTING-STARTED.md](GETTING-STARTED.md) → [ARCHITECTURE.md](ARCHITECTURE.md).
+**기여자라면 먼저** [../CONTRIBUTING.md](../CONTRIBUTING.md). **처음이라면**: [STATUS.md](STATUS.md)(현황) → [GETTING-STARTED.md](GETTING-STARTED.md) → [ARCHITECTURE.md](ARCHITECTURE.md).
 
 | 문서 | 내용 |
 |---|---|
