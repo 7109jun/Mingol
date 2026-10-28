@@ -2,7 +2,7 @@
 
 문서 라이선스: CC BY 4.0. 코드: GPL-2.0-only.
 
-언어 명세는 [SCRIPT.md](SCRIPT.md). 이 문서는 **게임 스크립트를 쓰는 방법**을 다룬다. 예제는 테스트에서 실제로 컴파일·실행되는 형태를 기준으로 한다.
+언어 명세는 [SCRIPT.md](SCRIPT.md). 본격적인 문서 시리즈는 [script/01-overview.md](script/01-overview.md)(소개·언어 기초·타입과 객체·고급 기능·엔진 연동). 이 문서는 **게임 스크립트를 쓰는 방법**을 다룬다. 예제는 테스트에서 실제로 컴파일·실행되는 형태를 기준으로 한다.
 
 ## 첫 스크립트
 `scripts/hero.mins`:
@@ -15,7 +15,7 @@ class Hero extends Script {
 }
 ```
 - `Script`를 상속한 클래스가 **컴포넌트**가 된다. 에디터 인스펙터의 *Add Component* 버튼에서 `Script: <클래스>`를 골라 붙이거나, C++에서 `host.addScript(gameObject, "Hero")`.
-- `public` 필드는 인스펙터에 노출되고 `.minseen`에 저장된다(int/float/bool/string/enum과 그 배열).
+- **정적이 아닌 데이터 필드**는 접근 수정자와 무관하게 인스펙터에 노출되고 `.minseen`에 저장된다(int/float/bool/string/enum과 그 배열; 객체 타입 필드는 저장되지 않음).
 - `gameObject`로 자신의 GameObject에 접근한다.
 
 ## 콜백 (Scene 생명주기와 동일)
@@ -34,7 +34,7 @@ class Hero extends Script {
 - 정적 타입, `int`는 64비트 래핑, 문자열은 UTF-8 바이트 단위.
 - 코루틴: `coroutine void blink() { yield 1; }` → 호출하면 `Coroutine` 객체, `resume()`으로 진행.
 - 예외는 `Exception` 파생 객체만 던질 수 있다. `try/catch/finally` 지원.
-- 람다 `(int x) => x * k`는 값 캡처.
+- 람다 `(int x) => x * k`는 바깥 변수를 **값 복사가 아니라 공유(참조)** 로 캡처한다. 자세한 규칙은 [script/04-advanced-features.md](script/04-advanced-features.md).
 - 리플렉션: `typeof(T)`, `getFields()` 등(인스펙터가 이것을 쓴다).
 
 ## 에디터에서의 흐름

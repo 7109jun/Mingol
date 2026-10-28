@@ -20,6 +20,7 @@
 | [GUI.md](GUI.md) · [EDITOR.md](EDITOR.md) | GUI 시스템, 에디터 |
 | [PLAYER.md](PLAYER.md) | 플레이어 |
 | [SCRIPT.md](SCRIPT.md) · [SCRIPTING-GUIDE.md](SCRIPTING-GUIDE.md) | 언어/VM 명세, 작성 가이드 |
+| **Mingol Script 문서 시리즈** [1 소개](script/01-overview.md) · [2 언어 기초](script/02-language-basics.md) · [3 타입과 객체](script/03-types-and-objects.md) · [4 고급 기능](script/04-advanced-features.md) · [5 엔진 연동](script/05-engine-integration.md) | 전문 가이드 5편(모든 예제 실행 검증) |
 | [MINDEV.md](MINDEV.md) · [MINSEEN.md](MINSEEN.md) · [MINGOL.md](MINGOL.md) | 파일 형식 |
 | [SECURITY.md](SECURITY.md) | 보안 모델 |
 | [GLOSSARY.md](GLOSSARY.md) | 용어집 |
